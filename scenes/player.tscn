@@ -1,0 +1,57 @@
+[gd_scene load_steps=4 format=3 uid="uid://cryp50c6g2t2"]
+
+[ext_resource type="Script" path="res://scripts/Player.gd" id="1_script"]
+[ext_resource type="AudioStream" path="res://assets/sounds/thrust.wav" id="2_sound"]
+[ext_resource type="AudioStream" path="res://assets/sounds/crash.wav" id="3_sound"]
+
+[ext_resource type="PhysicsMaterial" uid="uid://bounce_mat" path="res://assets/bounce.tres" id="2_phys"]
+
+[node name="Player" type="RigidBody2D"]
+collision_layer = 1
+center_of_mass_mode = 1
+gravity_scale = 0.0
+linear_damp = 1.0
+angular_damp = 2.0
+physics_material_override = ExtResource("2_phys")
+contact_monitor = true
+max_contacts_reported = 4
+script = ExtResource("1_script")
+
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
+polygon = PackedVector2Array(0, -24, 16, 16, 0, 8, -16, 16)
+
+[node name="ShipVisuals" type="Polygon2D" parent="."]
+color = Color(0.2, 0.8, 1, 1)
+polygon = PackedVector2Array(0, -24, 16, 16, 0, 8, -16, 16)
+
+[node name="MainThruster" type="Polygon2D" parent="ShipVisuals"]
+visible = false
+color = Color(1, 0.5, 0, 1)
+polygon = PackedVector2Array(-8, 16, 8, 16, 0, 32)
+offset = Vector2(0, 0)
+
+[node name="LeftThruster" type="Polygon2D" parent="ShipVisuals"]
+visible = false
+position = Vector2(-14, -16)
+rotation = 1.5708
+scale = Vector2(0.5, 0.5)
+color = Color(1, 0.5, 0, 1)
+polygon = PackedVector2Array(0, 0, -8, 16, 0, 32, 8, 16)
+
+[node name="RightThruster" type="Polygon2D" parent="ShipVisuals"]
+visible = false
+position = Vector2(14, -16)
+rotation = -1.5708
+scale = Vector2(0.5, 0.5)
+color = Color(1, 0.5, 0, 1)
+polygon = PackedVector2Array(0, 0, -8, 16, 0, 32, 8, 16)
+
+[node name="Camera2D" type="Camera2D" parent="."]
+zoom = Vector2(1.5, 1.5)
+
+[node name="ThrusterSound" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("2_sound")
+
+[node name="CrashSound" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("3_sound")

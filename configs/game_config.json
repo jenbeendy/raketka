@@ -1,0 +1,9 @@
+{
+    "fuel_consumption_rate": 5.0,
+    "refill_amount": 50.0,
+    "max_fuel": 100.0,
+    "spaceship_durability": 100.0,
+    "thrust_strength": 500.0,
+    "rotation_torque": 2000.0,
+    "map_pixel_scale": 64
+}
