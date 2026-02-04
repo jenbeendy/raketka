@@ -77,15 +77,7 @@ func _physics_process(delta):
 			current_fuel -= fuel_consumption * delta
 			is_thrusting = true
 		
-		# Slow Down / Reverse (Down arrow / S)
-		if Input.is_action_pressed("ui_down") or Input.is_physical_key_pressed(KEY_S):
-			var force_dir = Vector2.UP.rotated(rotation)
-			# Reverse force
-			apply_central_force(force_dir * -thrust_strength * 0.5)
-			current_fuel -= fuel_consumption * 0.5 * delta
-			# We don't have a specific visual for "braking" but we could reuse thrust sound
-			if thruster_sound and not thruster_sound.playing:
-				thruster_sound.play()
+
 		
 		# Rotation
 		# Left Arrow / A -> Rotate Counter-Clockwise -> Fire Right Thruster
@@ -110,18 +102,9 @@ func _physics_process(delta):
 		if thruster_sound and not thruster_sound.playing:
 			thruster_sound.play()
 	else:
-		# Need to check braking sound separately if we want it, 
-		# but for now logic is simple: if any key pressed -> sound logic above needs update
-		# If braking was pressed, we might want sound too.
-		
-		# Let's simple check inputs again for sound or use flags
-		var is_braking = Input.is_action_pressed("ui_down") or Input.is_physical_key_pressed(KEY_S)
-		if is_braking and current_fuel > 0:
-			if thruster_sound and not thruster_sound.playing:
-				thruster_sound.play()
-		else:
-			if thruster_sound:
-				thruster_sound.stop()
+		if thruster_sound:
+			thruster_sound.stop()
+
 
 
 
