@@ -29,10 +29,16 @@ func _ready():
 	max_durability = ConfigManager.get_param("spaceship_durability", 100.0)
 	durability = max_durability
 	
+	# Override damp to 0 for space physics (inertia)
+	linear_damp_mode = RigidBody2D.DAMP_MODE_REPLACE
+	angular_damp_mode = RigidBody2D.DAMP_MODE_REPLACE
+	linear_damp = 0.0
+	angular_damp = 0.0 # No damping, continuous rotation
+
+
+	
 	current_fuel = max_fuel
 	emit_signal("fuel_changed", current_fuel, max_fuel)
-	emit_signal("health_changed", durability, max_durability)
-	
 	emit_signal("health_changed", durability, max_durability)
 	
 	body_entered.connect(_on_body_entered)
@@ -53,7 +59,6 @@ func _on_config_updated(key, value):
 			emit_signal("fuel_changed", current_fuel, max_fuel)
 
 func config_init():
-
 	pass
 
 func _physics_process(delta):
@@ -64,26 +69,33 @@ func _physics_process(delta):
 	if current_fuel > 0:
 		# Translation (Up relative to ship)
 		# Godot 2D: Up is (0, -1). Rotated by rotation.
-		# But RigidBody apply_central_force is in global coordinates usually, 
-		# or utilize local basis.
 		
-		# Move Forward (Up arrow) -> Fire Bottom Thruster -> Force Upwards relative to ship
-		if Input.is_action_pressed("ui_up") or Input.is_action_pressed("ui_accept"): # W is often mapped to ui_up or we accept defaults
-			# Apply force in the direction the ship is facing (Vector2.UP rotated)
+		# Move Forward (Up arrow / W)
+		if Input.is_action_pressed("ui_up") or Input.is_physical_key_pressed(KEY_W): 
 			var force_dir = Vector2.UP.rotated(rotation)
 			apply_central_force(force_dir * thrust_strength)
 			current_fuel -= fuel_consumption * delta
 			is_thrusting = true
 		
+		# Slow Down / Reverse (Down arrow / S)
+		if Input.is_action_pressed("ui_down") or Input.is_physical_key_pressed(KEY_S):
+			var force_dir = Vector2.UP.rotated(rotation)
+			# Reverse force
+			apply_central_force(force_dir * -thrust_strength * 0.5)
+			current_fuel -= fuel_consumption * 0.5 * delta
+			# We don't have a specific visual for "braking" but we could reuse thrust sound
+			if thruster_sound and not thruster_sound.playing:
+				thruster_sound.play()
+		
 		# Rotation
-		# Left Arrow (ui_left) -> Rotate Counter-Clockwise -> Fire Right Thruster
-		if Input.is_action_pressed("ui_left"):
+		# Left Arrow / A -> Rotate Counter-Clockwise -> Fire Right Thruster
+		if Input.is_action_pressed("ui_left") or Input.is_physical_key_pressed(KEY_A):
 			apply_torque(-rotation_torque)
 			current_fuel -= fuel_consumption * 0.5 * delta
 			is_rotating_left = true
 			
-		# Right Arrow (ui_right) -> Rotate Clockwise -> Fire Left Thruster
-		if Input.is_action_pressed("ui_right"):
+		# Right Arrow / D -> Rotate Clockwise -> Fire Left Thruster
+		if Input.is_action_pressed("ui_right") or Input.is_physical_key_pressed(KEY_D):
 			apply_torque(rotation_torque)
 			current_fuel -= fuel_consumption * 0.5 * delta
 			is_rotating_right = true
@@ -98,8 +110,19 @@ func _physics_process(delta):
 		if thruster_sound and not thruster_sound.playing:
 			thruster_sound.play()
 	else:
-		if thruster_sound:
-			thruster_sound.stop()
+		# Need to check braking sound separately if we want it, 
+		# but for now logic is simple: if any key pressed -> sound logic above needs update
+		# If braking was pressed, we might want sound too.
+		
+		# Let's simple check inputs again for sound or use flags
+		var is_braking = Input.is_action_pressed("ui_down") or Input.is_physical_key_pressed(KEY_S)
+		if is_braking and current_fuel > 0:
+			if thruster_sound and not thruster_sound.playing:
+				thruster_sound.play()
+		else:
+			if thruster_sound:
+				thruster_sound.stop()
+
 
 
 func update_visuals(main, left, right):
