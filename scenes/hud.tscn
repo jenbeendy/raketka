@@ -1,9 +1,49 @@
 [gd_scene load_steps=2 format=3 uid="uid://hud"]
 
 [ext_resource type="Script" path="res://scripts/HUD.gd" id="1_hud"]
+[ext_resource type="Theme" uid="uid://main_theme" path="res://assets/main_theme.tres" id="2_theme"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.1, 0.1, 0.1, 0.9)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0, 0.6, 1, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+shadow_size = 10
+shadow_color = Color(0, 0, 0, 0.5)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_normal"]
+bg_color = Color(0, 0.4, 0.8, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+content_margin_left = 20
+content_margin_right = 20
+content_margin_top = 10
+content_margin_bottom = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_hover"]
+bg_color = Color(0, 0.5, 1, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+content_margin_left = 20
+content_margin_right = 20
+content_margin_top = 10
+content_margin_bottom = 10
 
 [node name="HUD" type="CanvasLayer"]
+scale = Vector2(1, 1)
+transform = Transform2D(1, 0, 0, 1, 0, 0)
 script = ExtResource("1_hud")
+
 
 [node name="Control" type="Control" parent="."]
 layout_mode = 3
@@ -12,6 +52,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("2_theme")
 
 [node name="MarginContainer" type="MarginContainer" parent="Control"]
 layout_mode = 1
@@ -67,19 +108,114 @@ grow_vertical = 2
 
 [node name="PanelContainer" type="PanelContainer" parent="Control/GameOverMenu"]
 layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="Control/GameOverMenu/PanelContainer"]
 layout_mode = 2
-theme_override_constants/separation = 20
+theme_override_constants/separation = 30
+
+[node name="TitleLabel" type="Label" parent="Control/GameOverMenu/PanelContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "MISSION STATUS"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="Control/GameOverMenu/PanelContainer/VBoxContainer"]
+layout_mode = 2
 
 [node name="MessageLabel" type="Label" parent="Control/GameOverMenu/PanelContainer/VBoxContainer"]
 layout_mode = 2
+theme_override_font_sizes/font_size = 24
 text = "GAME OVER"
 horizontal_alignment = 1
 
 [node name="RestartButton" type="Button" parent="Control/GameOverMenu/PanelContainer/VBoxContainer"]
 layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_normal")
 text = "RESTART MISSION"
+
+[node name="SettingsButton" type="Button" parent="Control/GameOverMenu/PanelContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_normal")
+text = "SETTINGS"
+
+[node name="SettingsPanel" type="PanelContainer" parent="Control/GameOverMenu"]
+visible = false
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Control/GameOverMenu/SettingsPanel"]
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="Label" type="Label" parent="Control/GameOverMenu/SettingsPanel/VBoxContainer"]
+layout_mode = 2
+text = "CONFIGURATION"
+horizontal_alignment = 1
+
+[node name="GridContainer" type="GridContainer" parent="Control/GameOverMenu/SettingsPanel/VBoxContainer"]
+layout_mode = 2
+columns = 2
+theme_override_constants/h_separation = 20
+theme_override_constants/v_separation = 10
+
+[node name="ThrustLabel" type="Label" parent="Control/GameOverMenu/SettingsPanel/VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Thrust Power"
+
+[node name="ThrustSlider" type="HSlider" parent="Control/GameOverMenu/SettingsPanel/VBoxContainer/GridContainer"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+min_value = 100.0
+max_value = 2000.0
+step = 50.0
+value = 500.0
+
+[node name="TorqueLabel" type="Label" parent="Control/GameOverMenu/SettingsPanel/VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Rotation Speed"
+
+[node name="TorqueSlider" type="HSlider" parent="Control/GameOverMenu/SettingsPanel/VBoxContainer/GridContainer"]
+layout_mode = 2
+min_value = 500.0
+max_value = 5000.0
+step = 100.0
+value = 2000.0
+
+[node name="FuelUseLabel" type="Label" parent="Control/GameOverMenu/SettingsPanel/VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Fuel Consumption"
+
+[node name="FuelUseSlider" type="HSlider" parent="Control/GameOverMenu/SettingsPanel/VBoxContainer/GridContainer"]
+layout_mode = 2
+min_value = 1.0
+max_value = 20.0
+step = 0.5
+value = 5.0
+
+[node name="DurabilityLabel" type="Label" parent="Control/GameOverMenu/SettingsPanel/VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Ship Durability"
+
+[node name="DurabilitySlider" type="HSlider" parent="Control/GameOverMenu/SettingsPanel/VBoxContainer/GridContainer"]
+layout_mode = 2
+min_value = 10.0
+max_value = 500.0
+step = 10.0
+value = 100.0
+
+[node name="CloseSettingsButton" type="Button" parent="Control/GameOverMenu/SettingsPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_normal")
+text = "CLOSE"
+
+
 
 [node name="NotificationContainer" type="CenterContainer" parent="Control"]
 layout_mode = 1

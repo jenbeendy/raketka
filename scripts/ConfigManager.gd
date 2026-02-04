@@ -6,7 +6,20 @@ const CONFIG_PATH = "res://configs/game_config.json"
 func _ready():
 	load_config()
 
+signal config_updated(key, value)
+
 func load_config():
+	# Load user config first if exists
+	var user_path = "user://custom_config.json"
+	if FileAccess.file_exists(user_path):
+		var file = FileAccess.open(user_path, FileAccess.READ)
+		var json = JSON.new()
+		if json.parse(file.get_as_text()) == OK:
+			var user_config = json.data
+			config.merge(user_config, true)
+			print("User config loaded override.")
+			return
+
 	if FileAccess.file_exists(CONFIG_PATH):
 		var file = FileAccess.open(CONFIG_PATH, FileAccess.READ)
 		var json_string = file.get_as_text()
@@ -32,3 +45,14 @@ func load_config():
 
 func get_param(key, default_value = null):
 	return config.get(key, default_value)
+
+func set_param(key, value):
+	config[key] = value
+	emit_signal("config_updated", key, value)
+	# Auto save?
+	save_user_config()
+
+func save_user_config():
+	var file = FileAccess.open("user://custom_config.json", FileAccess.WRITE)
+	file.store_string(JSON.stringify(config))
+

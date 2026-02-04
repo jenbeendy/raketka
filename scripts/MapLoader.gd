@@ -15,12 +15,27 @@ func _ready():
 	load_map()
 
 func load_map():
-	if not FileAccess.file_exists(map_path):
-		print("Map file not found: ", map_path)
-		return
+	# Try loading as a resource first (Works in Export if imported)
+	if ResourceLoader.exists(map_path):
+		var texture = load(map_path)
+		if texture is Texture2D:
+			var image = texture.get_image()
+			process_image_data(image)
+		else:
+			print("Map path is not a texture: ", map_path)
+	elif FileAccess.file_exists(map_path):
+		# Fallback for unimported files (e.g. user provided)
+		var image = Image.load_from_file(map_path)
+		if image:
+			process_image_data(image)
+		else:
+			print("Failed to load map image from file: ", map_path)
+	else:
+		print("Map resource/file not found: ", map_path)
 
-	var image = Image.load_from_file(map_path)
+func process_image_data(image):
 	var size = image.get_size()
+
 	
 	for x in range(size.x):
 		for y in range(size.y):

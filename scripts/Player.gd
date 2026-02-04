@@ -33,9 +33,27 @@ func _ready():
 	emit_signal("fuel_changed", current_fuel, max_fuel)
 	emit_signal("health_changed", durability, max_durability)
 	
+	emit_signal("health_changed", durability, max_durability)
+	
 	body_entered.connect(_on_body_entered)
+	
+	ConfigManager.config_updated.connect(_on_config_updated)
+
+func _on_config_updated(key, value):
+	match key:
+		"thrust_strength": thrust_strength = value
+		"rotation_torque": rotation_torque = value
+		"fuel_consumption_rate": fuel_consumption = value
+		"spaceship_durability": 
+			# Assuming change applies to next run or max?
+			max_durability = value
+			emit_signal("health_changed", durability, max_durability)
+		"max_fuel":
+			max_fuel = value
+			emit_signal("fuel_changed", current_fuel, max_fuel)
 
 func config_init():
+
 	pass
 
 func _physics_process(delta):

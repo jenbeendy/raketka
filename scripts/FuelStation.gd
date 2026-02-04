@@ -5,6 +5,8 @@ extends Area2D
 func _ready():
 	refill_amount = ConfigManager.get_param("refill_amount", 50.0)
 	body_entered.connect(_on_body_entered)
+	ConfigManager.config_updated.connect(func(k,v): if k=="refill_amount": refill_amount = v)
+
 
 
 func _process(delta):
